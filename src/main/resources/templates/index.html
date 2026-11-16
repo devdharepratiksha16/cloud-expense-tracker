@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Expense Tracker</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #243b55;
+        }
+
+        .cards {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        .card h3 {
+            color: #555;
+        }
+
+        .card p {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .form-box, .table-box {
+            background: white;
+            padding: 25px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #243b55;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #141e30;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #243b55;
+            color: white;
+        }
+
+        .income {
+            color: green;
+        }
+
+        .expense {
+            color: red;
+        }
+
+        .delete {
+            color: red;
+            text-decoration: none;
+        }
+
+        @media (max-width: 650px) {
+            .cards {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Cloud Expense Tracker</h1>
+    <p style="text-align:center;">
+        Manage your income and expenses easily.
+    </p>
+
+    <div th:if="${message}" th:text="${message}"
+         style="color:green; text-align:center;"></div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Balance</h3>
+            <p th:text="'₹' + ${balance}">₹0.00</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Income</h3>
+            <p class="income"
+               th:text="'₹' + ${totalIncome}">₹0.00</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Expenses</h3>
+            <p class="expense"
+               th:text="'₹' + ${totalExpenses}">₹0.00</p>
+        </div>
+
+    </div>
+
+    <div class="form-box">
+
+        <h2>Add New Transaction</h2>
+
+        <form th:action="@{/add}" method="post"
+      th:object="${newExpense}">
+
+            <input type="text"
+                   th:field="*{title}"
+                   placeholder="Transaction Title"
+                   required>
+
+            <input type="number"
+                   th:field="*{amount}"
+                   placeholder="Amount in Rupees"
+                   min="0.01"
+                   step="0.01"
+                   required>
+
+            <select th:field="*{type}" required>
+                <option value="">Select Type</option>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+            </select>
+
+            <select th:field="*{category}" required>
+                <option value="">Select Category</option>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Education">Education</option>
+                <option value="Salary">Salary</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <input type="date"
+                   th:field="*{date}"
+                   required>
+
+            <input type="text"
+                   th:field="*{description}"
+                   placeholder="Description (optional)">
+
+            <button type="submit">Add Transaction</button>
+
+        </form>
+
+    </div>
+
+    <div class="table-box">
+
+        <h2>Transaction History</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="expense : ${expenses}">
+
+                    <td th:text="${expense.title}"></td>
+
+                    <td th:text="'₹' + ${expense.amount}"></td>
+
+                    <td th:text="${expense.type}"></td>
+
+                    <td th:text="${expense.category}"></td>
+
+                    <td th:text="${expense.date}"></td>
+
+                    <td>
+                        <a class="delete"
+                           th:href="@{/delete/{id}(id=${expense.id})}"
+                           onclick="return confirm('Delete this transaction?')">
+                           Delete
+                        </a>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(expenses)}">
+                    <td colspan="6" style="text-align:center;">
+                        No transactions added yet.
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

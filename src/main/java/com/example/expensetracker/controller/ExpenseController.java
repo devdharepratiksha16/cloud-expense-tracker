@@ -19,6 +19,10 @@ public class ExpenseController {
     public ExpenseController(ExpenseService expenseService) {
         this.expenseService = expenseService;
     }
+    @ModelAttribute("newExpense")
+    public Expense prepareNewExpense() {
+    return new Expense();
+    }
 
     @GetMapping("/")
     public String home(Model model) {
